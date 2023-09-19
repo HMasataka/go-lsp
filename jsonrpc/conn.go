@@ -10,10 +10,12 @@ type ReaderWriter interface {
 	io.Writer
 	io.Closer
 }
+
 type CloserReader interface {
 	io.Reader
 	io.Closer
 }
+
 type fakeCloseReader struct {
 	io.Reader
 }
@@ -78,4 +80,3 @@ func (c *Conn) Close() error {
 	}
 	return fmt.Errorf("two errors, err1: %v, err2: %v", err1, err2)
 }
-

@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -57,11 +56,13 @@ func main() {
 	server.OnCompletion(func(ctx context.Context, req *defines.CompletionParams) (result *[]defines.CompletionItem, err error) {
 		logs.Println("completion: ", req)
 		d := defines.CompletionItemKindText
-		return &[]defines.CompletionItem{defines.CompletionItem{
-			Label:      "code",
-			Kind:       &d,
-			InsertText: strPtr("Hello"),
-		}}, nil
+		return &[]defines.CompletionItem{
+			{
+				Label:      "code",
+				Kind:       &d,
+				InsertText: strPtr("Hello"),
+			},
+		}, nil
 	})
 
 	server.OnDocumentFormatting(func(ctx context.Context, req *defines.DocumentFormattingParams) (result *[]defines.TextEdit, err error) {
@@ -76,8 +77,8 @@ func main() {
 			if v != r {
 				res = append(res, defines.TextEdit{
 					Range: defines.Range{
-						Start: defines.Position{uint(i), 0},
-						End:   defines.Position{uint(i), uint(len(v) + 1)},
+						Start: defines.Position{Line: uint(i), Character: 0},
+						End:   defines.Position{Line: uint(i), Character: uint(len(v) + 1)},
 					},
 					NewText: r,
 				})
@@ -91,7 +92,7 @@ func main() {
 
 func ReadFile(filename defines.DocumentUri) ([]string, error) {
 	enEscapeUrl, _ := url.QueryUnescape(string(filename))
-	data, err := ioutil.ReadFile(enEscapeUrl[6:])
+	data, err := os.ReadFile(enEscapeUrl[6:])
 	if err != nil {
 		return nil, err
 	}
